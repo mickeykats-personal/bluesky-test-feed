@@ -1,6 +1,24 @@
 import { AtpAgent } from '@atproto/api'
 
-const agent = new AtpAgent({ service: 'https://public.api.bsky.app' })
+const agent = new AtpAgent({ service: 'https://bsky.social' })
+
+let isLoggedIn = false
+
+async function ensureLoggedIn() {
+  if (isLoggedIn) return
+
+  const handle = process.env.BLUESKY_HANDLE
+  const password = process.env.BLUESKY_APP_PASSWORD
+
+  if (handle && password) {
+    try {
+      await agent.login({ identifier: handle, password })
+      isLoggedIn = true
+    } catch (error) {
+      console.error('Failed to login:', error)
+    }
+  }
+}
 
 export async function searchPosts(
   query: string,
@@ -8,6 +26,8 @@ export async function searchPosts(
   cursor?: string
 ): Promise<{ posts: { uri: string }[]; cursor?: string }> {
   try {
+    await ensureLoggedIn()
+
     const response = await agent.app.bsky.feed.searchPosts({
       q: query,
       limit,
