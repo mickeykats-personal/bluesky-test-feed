@@ -1,79 +1,83 @@
 # Photonics Feed for Bluesky
 
-A custom Bluesky feed generator that shows posts containing the word "photonics".
+A custom Bluesky feed generator that shows posts containing the word "photonics". Designed to run on Vercel.
 
 ## How It Works
 
-This feed generator:
-1. Connects to the Bluesky firehose to listen for all new posts
-2. Filters posts that contain the word "photonics" (case-insensitive)
-3. Stores matching posts in a SQLite database
-4. Serves the feed via an HTTP API that Bluesky can query
+This feed generator uses Bluesky's search API to find posts containing "photonics". When someone views your feed, Vercel's serverless functions query Bluesky for matching posts and return them.
 
-## Setup
+**Architecture:**
+- No database needed - searches are done on-demand
+- Runs on Vercel's free tier
+- Uses Bluesky's public search API
 
-### Prerequisites
+## Deployment
 
-- Node.js 18+
-- A domain/hostname where you'll host the feed
-- A Bluesky account
+### 1. Deploy to Vercel
 
-### Installation
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/bluesky-test-feed)
+
+Or manually:
+1. Fork/clone this repo
+2. Go to [vercel.com](https://vercel.com) and import the project
+3. Add environment variables (see below)
+4. Deploy
+
+### 2. Configure Environment Variables
+
+In your Vercel project settings, add these environment variables:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `FEEDGEN_HOSTNAME` | Your Vercel domain | `your-feed.vercel.app` |
+| `FEEDGEN_PUBLISHER_DID` | Your Bluesky DID | `did:plc:abc123...` |
+
+**Finding your DID:** Go to your Bluesky profile → Settings → Advanced → Copy your DID
+
+### 3. Publish the Feed to Bluesky
+
+After deploying, you need to register the feed with your Bluesky account:
 
 ```bash
+# Clone the repo locally
 npm install
-```
 
-### Configuration
-
-Copy `.env.example` to `.env` and fill in your values:
-
-```bash
+# Create .env file with your credentials
 cp .env.example .env
+# Edit .env and fill in your values
+
+# Publish the feed
+npm run publish-feed
 ```
 
-Required environment variables:
-- `FEEDGEN_HOSTNAME` - Your domain (e.g., `feeds.example.com`)
-- `FEEDGEN_PUBLISHER_DID` - Your Bluesky DID (find it in your profile settings)
-- `FEEDGEN_PORT` - Port to run the server on (default: 3000)
-
-### Running
-
-Development mode:
-```bash
-npm run dev
-```
-
-Production:
-```bash
-npm run build
-npm start
-```
-
-### Publishing the Feed
-
-To register your feed on Bluesky, add these to your `.env`:
-- `BLUESKY_HANDLE` - Your Bluesky handle
-- `BLUESKY_APP_PASSWORD` - An app password from Bluesky settings
-
-Then run:
-```bash
-npx ts-node scripts/publishFeed.ts
-```
+Your feed will then be available at:
+`https://bsky.app/profile/YOUR_HANDLE/feed/photonics`
 
 ## API Endpoints
 
 - `GET /` - Health check
-- `GET /.well-known/did.json` - DID document for the feed generator
-- `GET /xrpc/app.bsky.feed.describeFeedGenerator` - Feed generator description
-- `GET /xrpc/app.bsky.feed.getFeedSkeleton` - The feed skeleton (list of posts)
+- `GET /.well-known/did.json` - DID document
+- `GET /xrpc/app.bsky.feed.describeFeedGenerator` - Feed description
+- `GET /xrpc/app.bsky.feed.getFeedSkeleton` - Feed content
 
-## Deployment
+## Local Development
 
-The feed generator needs to be accessible via HTTPS at your configured hostname. You can use services like:
-- Railway
-- Fly.io
-- DigitalOcean
-- Any VPS with a reverse proxy (nginx, Caddy)
+```bash
+npm install
+cp .env.example .env
+# Edit .env with your values
+npm run dev
+```
 
-Make sure to set up SSL and point your domain to your server.
+## Customizing
+
+To search for different terms, edit `lib/config.ts`:
+
+```typescript
+export const feedConfig = {
+  shortname: 'photonics',
+  displayName: 'Photonics',
+  description: 'Posts about photonics',
+  searchQuery: 'photonics',  // Change this to search for different terms
+}
+```

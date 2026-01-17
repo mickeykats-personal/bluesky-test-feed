@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/.well-known/did.json",
+      "destination": "/api/.well-known/did.json"
+    },
+    {
+      "source": "/xrpc/:path*",
+      "destination": "/api/xrpc/:path*"
+    }
+  ]
+}
