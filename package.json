@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "description": "A Bluesky feed generator for posts about photonics",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build",
     "publish-feed": "ts-node scripts/publishFeed.ts"
   },
   "dependencies": {
