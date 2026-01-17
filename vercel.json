@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/api"
+    },
+    {
+      "source": "/.well-known/did.json",
+      "destination": "/api/did"
+    },
+    {
+      "source": "/xrpc/app.bsky.feed.describeFeedGenerator",
+      "destination": "/api/xrpc/describeFeedGenerator"
+    },
+    {
+      "source": "/xrpc/app.bsky.feed.getFeedSkeleton",
+      "destination": "/api/xrpc/getFeedSkeleton"
+    }
+  ]
+}
