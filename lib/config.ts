@@ -8,5 +8,5 @@ export const feedConfig = {
   shortname: 'photonics',
   displayName: 'Photonics',
   description: 'Posts about photonics',
-  searchQuery: 'science',  // temporarily changed to test
+  searchQuery: 'photonics',
 }
